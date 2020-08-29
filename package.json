@@ -1,0 +1,24 @@
+{
+  "name": "snowpack-resolve-alias",
+  "version": "1.0.0",
+  "description": "Resolves the \"aliases\" from snwopack in the build and run process.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jcschmidig/snowpack-resolve-alias.git"
+  },
+  "keywords": [
+    "snowpack",
+    "resolve",
+    "alias"
+  ],
+  "author": "Jean-Claude Schmidig",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jcschmidig/snowpack-resolve-alias/issues"
+  },
+  "homepage": "https://github.com/jcschmidig/snowpack-resolve-alias#readme"
+}
