@@ -6,7 +6,7 @@ module.exports = function (snowpackConfig, pluginOptions) {
     const aliases = getAlias(snowpackConfig.alias, devPath)
     //
     return {
-        name: 'resolve-alias',
+        name: 'snowpack-resolve-alias',
         async transform({ id:srcFilename, contents:srcContent }) {
             // check input
             if ( !(typeof srcFilename === 'string' &&
