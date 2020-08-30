@@ -84,7 +84,7 @@ function Content(source) {
         const regex = `(\\s+from\\s+['|"])${escape(key)}(['|"|\\/])`
         const match = new RegExp(regex, 'g')
         const repl = `$1${val}$2`
-        if (this.source.match(regex)) {
+        if (match.test(this.source)) {
             this.source = this.source.replace(match, repl)
             this.changed = true
         }
