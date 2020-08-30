@@ -46,10 +46,10 @@ function unsetSlash(value) {
     if (typeof value !== 'string') return ""
     //
     return value.substring(
-        // start: ~~false => 0, ~~true => 1
-        ~~value.startsWith(SLASH),
+        // start: false => 0, true => 1
+        +value.startsWith(SLASH),
         // length - [ 0 | 1 ]
-        value.length - ~~value.endsWith(SLASH)
+        value.length - value.endsWith(SLASH)
     )
 }
 function setSlash(value) {
@@ -108,7 +108,7 @@ function Warning(state) {
         //
         if (!this.warnings.has(key)) {
             this.warnings.add(key)
-            console.log("[snowpack-resolve-alias] used for alias "+key)
+            console.log(`[snowpack-resolve-alias] used for alias ${key}`)
         }
     }
 }
