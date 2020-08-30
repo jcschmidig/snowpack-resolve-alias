@@ -1,6 +1,6 @@
 {
   "name": "snowpack-resolve-alias",
-  "version": "1.0.4",
+  "version": "1.1.0",
   "description": "Resolves the \"aliases\" from snwopack in the build and run process.",
   "main": "index.js",
   "scripts": {
