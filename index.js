@@ -56,21 +56,16 @@ function setSlash(value) {
     return SLASH + unsetSlash(value) + SLASH
 }
 //
-function getAlias(config={}, path="") {
+function getAlias(config={}, devPath="") {
     const alias = new Map()
-    for (const key in config) {
-        alias.set(
-            unsetSlash(key),
-            // extract destination path
-            unsetSlash(config[key].tail(path))
-        )
-    }
+    for (const [name, path] of Object.entries(config))
+        alias.set(unsetSlash(name), unsetSlash(path.tail(devPath)))
     return alias
 }
 //
-function distance(filePath, sep) {
-    // How many slashes behind the separator do we count?
-    return --filePath.tail(sep)
+function distance(filePath, path) {
+    // count the slashes behind the path
+    return --filePath.tail(path)
                      .split(SLASH)
                      .length
 }
@@ -80,35 +75,33 @@ function Content(source, warning) {
     this.source = source
     this.warning = warning
     this.changedSource = function() {
-        if (this.changed) return this.source
+        return this.changed && this.source
     }
-    this.replace = function(key, val) {
-        // [import {xxx}] from '<key>' => from '<val>'
-        const regex = `(\\s+from\\s+['|"])${escape(key)}(['|"|\\/])`
+    this.replace = function(name, path) {
+        // look for [import {xxx}] from '<name>' ...
+        const regex = `(\\s+from\\s+['|"])${escape(name)}(['|"|\\/])`
+        // ... and multiple presence
         const match = new RegExp(regex, 'g')
-        // replace <key> with <val>
-        const repl = `$1${val}$2`
+        // replace <name> with <path>
+        const repl = `$1${path}$2`
         if (match.test(this.source)) {
             this.source = this.source.replace(match, repl)
             this.changed = true
-            this.warning.add(key)
+            this.warning.add(name)
         }
     }
-    //
-    function escape(string) {
-        return string.replace(/[.*+\-?^${}()|[\]\\]/g, '\\$&')
+    // secure name in regex
+    function escape(name) {
+        return name.replace(/[.*+\-?^${}()|[\]\\]/g, '\\$&')
     }
 }
 //
 function Warning(state) {
     this.state = state
     this.warnings = new Set()
-    this.add = function(key) {
-        if (this.state) return
-        //
-        if (!this.warnings.has(key)) {
-            this.warnings.add(key)
-            console.log(`[snowpack-resolve-alias] used for alias ${key}`)
-        }
+    this.add = function(name) {
+        !(this.state || this.warnings.has(name)) &&
+        this.warnings.add(name) &&
+        console.log(`[snowpack-resolve-alias] used for alias ${name}`)
     }
 }
