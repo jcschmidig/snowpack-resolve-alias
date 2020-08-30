@@ -4,6 +4,7 @@
 module.exports = function (snowpackConfig, pluginOptions) {
     const devPath = setSlash(pluginOptions.devPath || DEFAULT_PATH)
     const aliases = getAlias(snowpackConfig.alias, devPath)
+    const warning = new Warning(pluginOptions.noWarning || false)
     //
     return {
         name: 'snowpack-resolve-alias',
@@ -13,7 +14,7 @@ module.exports = function (snowpackConfig, pluginOptions) {
                    srcFilename.has(devPath) && srcFilename.endsWith('.js') &&
                    typeof srcContent === 'string') ) return
             //
-            const content = new Content(srcContent)
+            const content = new Content(srcContent, warning)
             // create relative path fragment
             const relPath = PARENT_DIR.repeat(distance(srcFilename, devPath))
                             ||
@@ -42,7 +43,7 @@ const
     DEFAULT_PATH = "src"
 //
 function unsetSlash(value) {
-    if (!(value && value.substring)) return ""
+    if (typeof value !== 'string') return ""
     //
     return value.substring(
         // start: ~~false => 0, ~~true => 1
@@ -74,23 +75,40 @@ function distance(filePath, sep) {
                      .length
 }
 //
-function Content(source) {
+function Content(source, warning) {
     this.changed = false
     this.source = source
+    this.warning = warning
     this.changedSource = function() {
         if (this.changed) return this.source
     }
     this.replace = function(key, val) {
+        // [import {xxx}] from '<key>' => from '<val>'
         const regex = `(\\s+from\\s+['|"])${escape(key)}(['|"|\\/])`
         const match = new RegExp(regex, 'g')
+        // replace <key> with <val>
         const repl = `$1${val}$2`
         if (match.test(this.source)) {
             this.source = this.source.replace(match, repl)
             this.changed = true
+            this.warning.add(key)
         }
     }
     //
     function escape(string) {
         return string.replace(/[.*+\-?^${}()|[\]\\]/g, '\\$&')
+    }
+}
+//
+function Warning(state) {
+    this.state = state
+    this.warnings = new Set()
+    this.add = function(key) {
+        if (this.state) return
+        //
+        if (!this.warnings.has(key)) {
+            this.warnings.add(key)
+            console.log("[snowpack-resolve-alias] used for alias "+key)
+        }
     }
 }

@@ -34,11 +34,12 @@ This plugin uses the same configuration "alias" in snowpack.config.json to make 
 ```
 "plugins": [
     [...*],
-    ["snowpack-resolve-alias", { "devPath": "src" }],
+    ["snowpack-resolve-alias", { "devPath": "src", "noWarning": true }],
     [...**]
 ]
 ```
 
-- option: `devPath`, denotes the directory with the source code, usually `src` which is also the default
+- option: `devPath`, denotes the directory with the source code, usually `src` which is also the default.
+- option: `noWarning`, disables the warning `[snwopack-resolve-alias] used for alias xxx` during compilation, default is false.
 
 - always put this plugin after a framework plugin like *svelte** and before a bundler plugin like *webpack***
