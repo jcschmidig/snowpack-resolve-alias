@@ -41,4 +41,4 @@ This plugin uses the same configuration "alias" in snowpack.config.json to make 
 
 - option: `devPath`, denotes the directory with the source code, usually `src` which is also the default
 
-- always put this plugin after a framework plugin like *svelte** and before a bundler plugin like *webpack***$
+- always put this plugin after a framework plugin like *svelte** and before a bundler plugin like *webpack***

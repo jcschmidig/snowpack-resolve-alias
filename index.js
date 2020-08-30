@@ -22,7 +22,7 @@ module.exports = function (snowpackConfig, pluginOptions) {
             for (const [aliasName, aliasPath] of aliases)
                 content.replace(aliasName, relPath + aliasPath)
             //
-            return content.source
+            return content.changedSource()
         }
     }
 }
@@ -75,9 +75,22 @@ function distance(filePath, sep) {
 }
 //
 function Content(source) {
+    this.changed = false
     this.source = source
+    this.changedSource = function() {
+        if (this.changed) return this.source
+    }
     this.replace = function(key, val) {
-        if (this.source.has(key))
-            this.source = this.source.replace(new RegExp(key, 'g'), val)
+        const regex = `(\\s+from\\s+['|"])${escape(key)}(['|"|\\/])`
+        const match = new RegExp(regex, 'g')
+        const repl = `$1${val}$2`
+        if (this.source.match(regex)) {
+            this.source = this.source.replace(match, repl)
+            this.changed = true
+        }
+    }
+    //
+    function escape(string) {
+        return string.replace(/[.*+\-?^${}()|[\]\\]/g, '\\$&')
     }
 }
