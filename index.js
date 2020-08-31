@@ -1,3 +1,4 @@
+"use strict"
 // Snowpack Plugin to resolve the alias correctly
 // Works above version 2.9
 //
@@ -10,9 +11,10 @@ module.exports = function (snowpackConfig, pluginOptions) {
         name: 'snowpack-resolve-alias',
         async transform({ id:srcFilename, contents:srcContent }) {
             // check input
-            if ( !(typeof srcFilename === 'string' &&
-                   srcFilename.has(devPath) && srcFilename.endsWith('.js') &&
-                   typeof srcContent === 'string') ) return
+            if ( !(typeof srcFilename === TYPEOF_STRING &&
+                   srcFilename.has(devPath) &&
+                   srcFilename.endsWith(EXT_JS) &&
+                   typeof srcContent === TYPEOF_STRING) ) return
             //
             const content = new Content(srcContent, warning)
             // create relative path fragment
@@ -37,13 +39,20 @@ String.prototype.tail = function(sep)
     { return this.split(sep).slice(1).join(sep) }
 //
 const
-    SLASH = "/"
+    DEFAULT_PATH = "src",
+    TYPEOF_STRING = 'string',
+    STRING_EMPTY = '',
+    OBJECT_EMPTY = {},
+    EXT_JS = ".js",
+    SLASH = "/",
     CURRENT_DIR = "./",
     PARENT_DIR = "../",
-    DEFAULT_PATH = "src"
+    LEFT_PAREN = "(",
+    RIGHT_PAREN = ")",
+    DOLLAR = "$"
 //
 function unsetSlash(value) {
-    if (typeof value !== 'string') return ""
+    if (typeof value !== TYPEOF_STRING) return STRING_EMPTY
     //
     return value.substring(
         // start: false => 0, true => 1
@@ -56,7 +65,7 @@ function setSlash(value) {
     return SLASH + unsetSlash(value) + SLASH
 }
 //
-function getAlias(config={}, devPath="") {
+function getAlias(config=OBJECT_EMPTY, devPath=STRING_EMPTY) {
     const alias = new Map()
     for (const [name, path] of Object.entries(config))
         alias.set(unsetSlash(name), unsetSlash(path.tail(devPath)))
@@ -78,17 +87,45 @@ function Content(source, warning) {
         return this.changed && this.source
     }
     this.replace = function(name, path) {
-        // look for [import {xxx}] from '<name>' ...
-        const regex = `(\\s+from\\s+['|"])${escape(name)}(['|"|\\/])`
-        // ... and multiple presence
-        const match = new RegExp(regex, 'g')
-        // replace <name> with <path>
-        const repl = `$1${path}$2`
-        if (match.test(this.source)) {
-            this.source = this.source.replace(match, repl)
+        const regex = new regexImport(this.source, name, path)
+        //
+        if (regex.test()) {
+            this.source = regex.replace()
             this.changed = true
             this.warning.add(name)
         }
+    }
+}
+//
+function regexImport(source, name, path) {
+    this.source = source
+    this.search = createSearch(name)
+    this.test = function() {
+        return this.search.test(this.source)
+    }
+    this.replace = function() {
+        return this.source.replace(this.search, replaceWith(path))
+    }
+    //
+    function createSearch(name) {
+        const WHITE_SPACE = '\\s+',
+              STR_DELIM = `['|"]`,
+              STR_SLASH_DELIM = `['|"|\\/]`
+        //
+        const rx = setGroup(WHITE_SPACE, 'from', WHITE_SPACE, STR_DELIM) +
+                   escape(name) +
+                   setGroup(STR_SLASH_DELIM)
+        //
+        return new RegExp(rx, 'g')
+    }
+    function replaceWith(path) {
+        return getGroup(1) + path + getGroup(2)
+    }
+    function setGroup(...elem) {
+        return LEFT_PAREN + elem.join(STRING_EMPTY) + RIGHT_PAREN
+    }
+    function getGroup(ord) {
+        return DOLLAR + ord
     }
     // secure name in regex
     function escape(name) {
