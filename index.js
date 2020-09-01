@@ -88,35 +88,36 @@ function Content(source, warning) {
     }
     this.replace = function(name, path) {
         const regex = new regexImport(this.source, name, path)
+        if (!regex.found()) return
         //
-        if (regex.test()) {
-            this.source = regex.replace()
-            this.changed = true
-            this.warning.add(name)
-        }
+        this.source = regex.replace()
+        this.changed |= true
+        this.warning.print(name)
     }
 }
 //
 function regexImport(source, name, path) {
     this.source = source
     this.search = createSearch(name)
-    this.test = function() {
+    this.path = replaceWith(path)
+    this.found = function() {
         return this.search.test(this.source)
     }
     this.replace = function() {
-        return this.source.replace(this.search, replaceWith(path))
+        return this.source.replace(this.search, this.path)
     }
     //
     function createSearch(name) {
         const WHITE_SPACE = '\\s+',
               STR_DELIM = `['|"]`,
-              STR_SLASH_DELIM = `['|"|\\/]`
+              STR_SLASH_DELIM = `['|"|\\/]`,
+              GLOBAL = 'g'
         //
         const rx = setGroup(WHITE_SPACE, 'from', WHITE_SPACE, STR_DELIM) +
                    escape(name) +
                    setGroup(STR_SLASH_DELIM)
         //
-        return new RegExp(rx, 'g')
+        return new RegExp(rx, GLOBAL)
     }
     function replaceWith(path) {
         return getGroup(1) + path + getGroup(2)
@@ -136,7 +137,7 @@ function regexImport(source, name, path) {
 function Warning(state) {
     this.state = state
     this.warnings = new Set()
-    this.add = function(name) {
+    this.print = function(name) {
         !(this.state || this.warnings.has(name)) &&
         this.warnings.add(name) &&
         console.log(`[snowpack-resolve-alias] used for alias ${name}`)

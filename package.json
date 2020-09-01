@@ -13,7 +13,8 @@
   "keywords": [
     "snowpack",
     "resolve",
-    "alias"
+    "alias",
+    "plugin"
   ],
   "author": "Jean-Claude Schmidig",
   "license": "ISC",
