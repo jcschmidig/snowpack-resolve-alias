@@ -21,5 +21,8 @@
   "bugs": {
     "url": "https://github.com/jcschmidig/snowpack-resolve-alias/issues"
   },
-  "homepage": "https://github.com/jcschmidig/snowpack-resolve-alias#readme"
+  "homepage": "https://github.com/jcschmidig/snowpack-resolve-alias#readme",
+  "dependencies": {
+    "plugin-resolve-alias": "^1.0.2"
+  }
 }
