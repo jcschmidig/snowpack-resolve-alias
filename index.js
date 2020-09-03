@@ -6,6 +6,7 @@ const { plugin, createAliases, createWarning } = require('plugin-resolve-alias')
 //
 module.exports = function (snowpackConfig, pluginOptions) {
     const devPath = pluginOptions.devPath || DEFAULT_PATH
+    const extensions = pluginOptions.extensions
     const Aliases = createAliases({
         config: snowpackConfig.alias,
         devPath
@@ -22,6 +23,7 @@ module.exports = function (snowpackConfig, pluginOptions) {
                 srcFilename,
                 srcContent,
                 devPath,
+                extensions,
                 Aliases,
                 Warning
             })
