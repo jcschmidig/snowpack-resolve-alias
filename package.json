@@ -23,6 +23,6 @@
   },
   "homepage": "https://github.com/jcschmidig/snowpack-resolve-alias#readme",
   "dependencies": {
-    "plugin-resolve-alias": "^1.0.2"
+    "plugin-resolve-alias": "^1.0.4"
   }
 }

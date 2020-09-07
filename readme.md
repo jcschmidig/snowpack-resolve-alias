@@ -34,9 +34,11 @@ This plugin uses the same configuration "alias" in snowpack.config.json to make 
 ```
 "plugins": [
     [...*],
-    ["snowpack-resolve-alias", { "extension": [ ".js" ],
-                                 "devPath": "src",
-                                 "noWarning": true }],
+    ["snowpack-resolve-alias", {
+        "extension": [ ".js" ],
+        "devPath": "src",
+        "noWarning": true
+    }],
     [...**]
 ]
 ```
