@@ -18,7 +18,7 @@ by configuring in `snowpack.config.json`
         "@user": "./src/store/user"
 }
 ```
-see also [Import Aliases](https://www.snowpack.dev/#import-aliases)
+see also [Import Aliases](https://www.snowpack.dev/reference/configuration#alias)
 
 #### 2. Why this plugin ?
 
